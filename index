@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>L'Architettura della Giustizia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --navy: #1a2340;
+  --navy-mid: #2d3a5c;
+  --gold: #c8a96e;
+  --gold-light: #e8c98e;
+  --rust: #b85c38;
+  --rust-light: #d47050;
+  --cream: #f5f0e8;
+  --cream-dark: #ede5d5;
+  --white: #ffffff;
+  --text-dark: #1a1a1a;
+  --text-mid: #4a4a4a;
+  --text-light: #8a8a8a;
+  --grid-color: rgba(26,35,64,0.06);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;}
+
+/* GRID BACKGROUND */
+body::before{
+  content:'';position:fixed;top:0;left:0;width:100%;height:100%;
+  background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);
+  background-size:40px 40px;pointer-events:none;z-index:0;
+}
+
+/* LANGUAGE SWITCHER */
+.lang-bar{
+  position:fixed;top:0;right:0;z-index:1000;
+  display:flex;gap:0;
+}
+.lang-btn{
+  padding:8px 20px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border:none;
+  background:var(--navy);color:rgba(255,255,255,0.5);transition:all 0.3s;
+}
+.lang-btn.active{background:var(--gold);color:var(--navy);}
+.lang-btn:hover:not(.active){color:var(--white);}
+
+/* BACK BUTTON */
+.back-btn{
+  position:fixed;top:0;left:0;z-index:1000;
+  padding:8px 20px;background:var(--navy);color:var(--gold);
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;
+  letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;border:none;
+  display:none;transition:all 0.3s;
+}
+.back-btn:hover{background:var(--navy-mid);}
+.back-btn.visible{display:block;}
+
+/* PAGES */
+.page{position:relative;z-index:1;min-height:100vh;display:none;}
+.page.active{display:block;}
+
+/* ===================== HOME PAGE ===================== */
+#home-page{padding:0;}
+
+.hero{
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:80px 40px 60px;text-align:center;position:relative;
+}
+.hero-tag{
+  font-size:11px;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);
+  font-weight:500;margin-bottom:24px;
+}
+.hero h1{
+  font-family:'Playfair Display',serif;font-size:clamp(48px,8vw,100px);
+  font-weight:900;line-height:0.92;color:var(--navy);margin-bottom:16px;
+  animation:fadeUp 1s ease both;
+}
+.hero h1 span{color:var(--gold);}
+.hero-sub{
+  font-size:clamp(14px,2vw,18px);color:var(--text-mid);max-width:500px;
+  line-height:1.6;margin-bottom:60px;animation:fadeUp 1s 0.2s ease both;
+}
+.scroll-hint{
+  font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:var(--text-light);
+  animation:pulse 2s infinite;
+}
+
+/* SECTION LABEL */
+.section-label{
+  font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);
+  font-weight:500;padding:80px 60px 32px;
+}
+
+/* CARDS GRID */
+.cards-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+  gap:2px;padding:0 2px 2px;
+}
+.card{
+  background:var(--white);padding:48px 40px;cursor:pointer;
+  position:relative;overflow:hidden;transition:all 0.4s cubic-bezier(0.16,1,0.3,1);
+  border-top:3px solid transparent;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;width:100%;height:100%;
+  background:var(--navy);transform:translateY(101%);transition:transform 0.5s cubic-bezier(0.16,1,0.3,1);
+  z-index:0;
+}
+.card:hover::before{transform:translateY(0);}
+.card:hover .card-num,.card:hover .card-title,.card:hover .card-desc,.card:hover .card-arrow{color:var(--white);}
+.card:hover .card-accent{background:var(--gold);}
+.card-accent{
+  width:40px;height:3px;background:var(--rust);margin-bottom:32px;
+  transition:background 0.3s;position:relative;z-index:1;
+}
+.card-num{
+  font-family:'Playfair Display',serif;font-size:13px;color:var(--text-light);
+  margin-bottom:16px;position:relative;z-index:1;transition:color 0.3s;
+  letter-spacing:0.1em;
+}
+.card-title{
+  font-family:'Playfair Display',serif;font-size:26px;font-weight:700;
+  color:var(--navy);line-height:1.15;margin-bottom:16px;
+  position:relative;z-index:1;transition:color 0.3s;
+}
+.card-desc{
+  font-size:14px;color:var(--text-mid);line-height:1.6;
+  position:relative;z-index:1;transition:color 0.3s;
+}
+.card-arrow{
+  position:absolute;bottom:40px;right:40px;font-size:24px;color:var(--navy-mid);
+  transition:all 0.4s;position:relative;z-index:1;text-align:right;margin-top:32px;
+}
+.card:hover .card-arrow{transform:translate(4px,-4px);}
+
+/* FOOTER */
+.home-footer{
+  padding:60px;text-align:center;
+  border-top:1px solid var(--cream-dark);
+  font-size:12px;color:var(--text-light);letter-spacing:0.1em;
+}
+
+/* ===================== DETAIL PAGE ===================== */
+#detail-page{padding:0;}
+
+.detail-hero{
+  background:var(--navy);padding:120px 80px 80px;position:relative;overflow:hidden;
+}
+.detail-hero::after{
+  content:'';position:absolute;top:-50%;right:-10%;width:600px;height:600px;
+  border:1px solid rgba(200,169,110,0.15);border-radius:50%;
+}
+.detail-hero::before{
+  content:'';position:absolute;top:-30%;right:5%;width:300px;height:300px;
+  border:1px solid rgba(200,169,110,0.08);border-radius:50%;
+}
+.detail-chapter{
+  font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);
+  margin-bottom:24px;position:relative;z-index:1;
+}
+.detail-hero h2{
+  font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,72px);
+  font-weight:900;color:var(--white);line-height:1;max-width:700px;
+  position:relative;z-index:1;
+}
+.detail-hero h2 span{color:var(--gold);}
+.detail-lead{
+  font-size:18px;color:rgba(255,255,255,0.6);max-width:600px;line-height:1.7;
+  margin-top:24px;position:relative;z-index:1;
+}
+
+/* CONTENT SECTIONS */
+.detail-body{max-width:900px;margin:0 auto;padding:80px 60px;}
+
+.content-block{margin-bottom:72px;animation:fadeUp 0.6s ease both;}
+
+.block-label{
+  font-size:11px;letter-spacing:0.25em;text-transform:uppercase;
+  color:var(--rust);font-weight:500;margin-bottom:16px;
+}
+.block-title{
+  font-family:'Playfair Display',serif;font-size:32px;font-weight:700;
+  color:var(--navy);margin-bottom:20px;line-height:1.2;
+}
+.block-text{
+  font-size:16px;color:var(--text-mid);line-height:1.8;margin-bottom:20px;
+}
+.block-text strong{color:var(--navy);font-weight:500;}
+
+/* INFO BOXES */
+.info-box{
+  background:var(--white);border-left:4px solid var(--gold);
+  padding:28px 32px;margin:32px 0;position:relative;
+}
+.info-box.rust{border-left-color:var(--rust);}
+.info-box.navy{border-left-color:var(--navy);}
+.info-box-title{
+  font-size:12px;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--gold);font-weight:500;margin-bottom:10px;
+}
+.info-box.rust .info-box-title{color:var(--rust);}
+.info-box.navy .info-box-title{color:var(--navy);}
+.info-box p{font-size:15px;color:var(--text-mid);line-height:1.7;}
+
+/* COMPARISON GRID */
+.compare-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:32px 0;
+}
+.compare-col{background:var(--white);padding:32px;}
+.compare-col.dark{background:var(--navy);}
+.compare-col-title{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:700;
+  color:var(--navy);margin-bottom:20px;
+}
+.compare-col.dark .compare-col-title{color:var(--white);}
+.compare-item{
+  padding:12px 0;border-bottom:1px solid var(--cream-dark);
+  font-size:14px;color:var(--text-mid);line-height:1.5;
+}
+.compare-col.dark .compare-item{color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.08);}
+.compare-item:last-child{border-bottom:none;}
+.compare-item strong{color:var(--navy);display:block;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:4px;}
+.compare-col.dark .compare-item strong{color:var(--gold);}
+
+/* STEPS */
+.steps{display:flex;flex-direction:column;gap:0;margin:32px 0;}
+.step{
+  display:flex;gap:24px;padding:28px 0;
+  border-bottom:1px solid var(--cream-dark);
+}
+.step:last-child{border-bottom:none;}
+.step-num{
+  font-family:'Playfair Display',serif;font-size:36px;font-weight:900;
+  color:var(--cream-dark);flex-shrink:0;line-height:1;min-width:48px;
+}
+.step-content{}
+.step-title{font-size:16px;font-weight:500;color:var(--navy);margin-bottom:6px;}
+.step-text{font-size:14px;color:var(--text-mid);line-height:1.6;}
+
+/* PILL BADGES */
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0;}
+.badge{
+  padding:6px 16px;font-size:12px;font-weight:500;letter-spacing:0.05em;
+  border:1px solid;
+}
+.badge.gold{border-color:var(--gold);color:var(--gold);}
+.badge.rust{border-color:var(--rust);color:var(--rust);}
+.badge.navy{border-color:var(--navy);color:var(--navy);}
+
+/* QUOTE */
+.pull-quote{
+  font-family:'Playfair Display',serif;font-size:22px;font-weight:400;
+  color:var(--navy);line-height:1.5;padding:40px 0;
+  border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);
+  margin:48px 0;
+}
+
+/* REFORM TOGGLE */
+.reform-toggle{
+  display:flex;gap:3px;margin:32px 0;
+}
+.reform-panel{
+  flex:1;padding:32px;cursor:pointer;background:var(--white);
+  transition:all 0.3s;position:relative;overflow:hidden;
+}
+.reform-panel.active-panel{background:var(--navy);}
+.reform-panel-tag{
+  font-size:11px;letter-spacing:0.2em;text-transform:uppercase;
+  font-weight:500;margin-bottom:12px;color:var(--text-light);
+}
+.reform-panel.active-panel .reform-panel-tag{color:var(--gold);}
+.reform-panel-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--navy);margin-bottom:16px;}
+.reform-panel.active-panel .reform-panel-title{color:var(--white);}
+.reform-panel ul{list-style:none;padding:0;}
+.reform-panel ul li{
+  font-size:14px;color:var(--text-mid);padding:8px 0;
+  border-bottom:1px solid var(--cream-dark);line-height:1.5;
+}
+.reform-panel.active-panel ul li{color:rgba(255,255,255,0.65);border-color:rgba(255,255,255,0.08);}
+.reform-panel ul li:last-child{border-bottom:none;}
+
+/* NAVIGATION FOOTER */
+.nav-footer{
+  background:var(--navy);padding:60px 80px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  flex-wrap:wrap;
+}
+.nav-footer-text{
+  font-size:12px;letter-spacing:0.15em;text-transform:uppercase;
+  color:rgba(255,255,255,0.3);
+}
+.nav-btns{display:flex;gap:12px;}
+.nav-btn{
+  padding:12px 28px;font-family:'DM Sans',sans-serif;font-size:12px;
+  font-weight:500;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.2);background:transparent;
+  color:rgba(255,255,255,0.6);transition:all 0.3s;
+}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold);}
+.nav-btn.primary{background:var(--gold);border-color:var(--gold);color:var(--navy);}
+.nav-btn.primary:hover{background:var(--gold-light);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:0.4;}50%{opacity:1;}}
+
+.fade-in{animation:fadeUp 0.5s ease both;}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .hero{padding:80px 24px 40px;}
+  .section-label{padding:60px 24px 24px;}
+  .cards-grid{grid-template-columns:1fr;}
+  .card{padding:36px 28px;}
+  .detail-hero{padding:100px 32px 60px;}
+  .detail-body{padding:48px 32px;}
+  .compare-grid{grid-template-columns:1fr;}
+  .reform-toggle{flex-direction:column;}
+  .nav-footer{padding:40px 32px;}
+}
+</style>
+</head>
+<body>
+
+<button class="back-btn" id="backBtn" onclick="showHome()">← <span class="lang-text" data-it="Indietro" data-en="Back">Indietro</span></button>
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('it')">IT</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+</div>
+
+<!-- ===================== HOME ===================== -->
+<div class="page active" id="home-page">
+  <div class="hero">
+    <div class="hero-tag lang-text" data-it="Sistema Giurisdizionale Italiano" data-en="Italian Judicial System">Sistema Giurisdizionale Italiano</div>
+    <h1><span class="lang-text" data-it="L'Architettura" data-en="The Architecture">L'Architettura</span><br><span class="lang-text" data-it="della <span class='gold-word'>Giustizia</span>" data-en="of <span class='gold-word'>Justice</span>">della <span class="gold-word" style="color:var(--gold)">Giustizia</span></span></h1>
+    <p class="hero-sub lang-text" data-it="Una guida completa al sistema giudiziario italiano, dalla sua struttura alle riforme in corso." data-en="A comprehensive guide to the Italian judicial system, from its structure to ongoing reforms.">Una guida completa al sistema giudiziario italiano, dalla sua struttura alle riforme in corso.</p>
+    <div class="scroll-hint lang-text" data-it="↓ Esplora le sezioni" data-en="↓ Explore sections">↓ Esplora le sezioni</div>
+  </div>
+
+  <div class="section-label lang-text" data-it="01 — Sezioni principali" data-en="01 — Main sections">01 — Sezioni principali</div>
+
+  <div class="cards-grid" id="cardsGrid">
+
+    <div class="card" onclick="showDetail(0)">
+      <div class="card-accent"></div>
+      <div class="card-num">01</div>
+      <div class="card-title lang-text" data-it="La Sentenza come Risultato" data-en="The Judgment as Outcome">La Sentenza come Risultato</div>
+      <div class="card-desc lang-text" data-it="Come la regola, la lite e il giudice terzo producono una decisione definitiva." data-en="How the rule, the dispute and the impartial judge produce a final decision.">Come la regola, la lite e il giudice terzo producono una decisione definitiva.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(1)">
+      <div class="card-accent"></div>
+      <div class="card-num">02</div>
+      <div class="card-title lang-text" data-it="La Macchina Giudiziaria" data-en="The Judicial Machine">La Macchina Giudiziaria</div>
+      <div class="card-desc lang-text" data-it="Giurisdizione ordinaria e speciale: i diversi rami del sistema giudiziario." data-en="Ordinary and special jurisdiction: the different branches of the judicial system.">Giurisdizione ordinaria e speciale: i diversi rami del sistema giudiziario.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(2)">
+      <div class="card-accent"></div>
+      <div class="card-num">03</div>
+      <div class="card-title lang-text" data-it="Civile vs Penale" data-en="Civil vs Criminal">Civile vs Penale</div>
+      <div class="card-desc lang-text" data-it="Le differenze fondamentali tra i due grandi filoni della giustizia ordinaria." data-en="The fundamental differences between the two main branches of ordinary justice.">Le differenze fondamentali tra i due grandi filoni della giustizia ordinaria.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(3)">
+      <div class="card-accent"></div>
+      <div class="card-num">04</div>
+      <div class="card-title lang-text" data-it="I Gradi di Giudizio" data-en="Degrees of Judgment">I Gradi di Giudizio</div>
+      <div class="card-desc lang-text" data-it="Dal primo grado alla Cassazione: come funziona il sistema dei ricorsi." data-en="From first instance to the Court of Cassation: how the appeals system works.">Dal primo grado alla Cassazione: come funziona il sistema dei ricorsi.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(4)">
+      <div class="card-accent"></div>
+      <div class="card-num">05</div>
+      <div class="card-title lang-text" data-it="La Mappa dei Processi" data-en="Map of Proceedings">La Mappa dei Processi</div>
+      <div class="card-desc lang-text" data-it="Percorsi processuali per materia: penale, civile, minorile." data-en="Procedural paths by subject matter: criminal, civil, juvenile.">Percorsi processuali per materia: penale, civile, minorile.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(5)">
+      <div class="card-accent"></div>
+      <div class="card-num">06</div>
+      <div class="card-title lang-text" data-it="La Corte di Cassazione" data-en="The Court of Cassation">La Corte di Cassazione</div>
+      <div class="card-desc lang-text" data-it="Il filtro della legittimità: cosa fa e cosa non fa il massimo organo giudicante." data-en="The legitimacy filter: what the supreme judicial body does and does not do.">Il filtro della legittimità: cosa fa e cosa non fa il massimo organo giudicante.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(6)">
+      <div class="card-accent"></div>
+      <div class="card-num">07</div>
+      <div class="card-title lang-text" data-it="Il CSM" data-en="The CSM">Il CSM</div>
+      <div class="card-desc lang-text" data-it="Il Consiglio Superiore della Magistratura: composizione, funzioni e autonomia." data-en="The Superior Council of the Judiciary: composition, functions and independence.">Il Consiglio Superiore della Magistratura: composizione, funzioni e autonomia.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(7)">
+      <div class="card-accent"></div>
+      <div class="card-num">08</div>
+      <div class="card-title lang-text" data-it="Giudice vs PM: La Carriera" data-en="Judge vs Prosecutor: Career">Giudice vs PM: La Carriera</div>
+      <div class="card-desc lang-text" data-it="L'attuale sistema della carriera unica e il dibattito sulla separazione." data-en="The current unified career system and the debate over separation of roles.">L'attuale sistema della carriera unica e il dibattito sulla separazione.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(8)">
+      <div class="card-accent"></div>
+      <div class="card-num">09</div>
+      <div class="card-title lang-text" data-it="La Riforma: Referendum" data-en="The Reform: Referendum">La Riforma: Referendum</div>
+      <div class="card-desc lang-text" data-it="Cosa cambia con la riforma referendaria: separazione delle carriere e nuovo CSM." data-en="What changes with the referendum reform: career separation and new CSM.">Cosa cambia con la riforma referendaria: separazione delle carriere e nuovo CSM.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(9)">
+      <div class="card-accent"></div>
+      <div class="card-num">10</div>
+      <div class="card-title lang-text" data-it="Procedimenti Disciplinari" data-en="Disciplinary Proceedings">Procedimenti Disciplinari</div>
+      <div class="card-desc lang-text" data-it="Come vengono sanzionati i magistrati: l'Alta Corte Disciplinare." data-en="How judges are sanctioned: the High Disciplinary Court.">Come vengono sanzionati i magistrati: l'Alta Corte Disciplinare.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(10)">
+      <div class="card-accent"></div>
+      <div class="card-num">11</div>
+      <div class="card-title lang-text" data-it="Il Giusto Processo" data-en="The Fair Trial">Il Giusto Processo</div>
+      <div class="card-desc lang-text" data-it="I quattro pilastri dell'Art. 111 Cost.: contraddittorio, terzietà, durata, motivazione." data-en="The four pillars of Art. 111 of the Constitution: adversarial process, impartiality, duration, motivation.">I quattro pilastri dell'Art. 111 Cost.: contraddittorio, terzietà, durata, motivazione.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(11)">
+      <div class="card-accent"></div>
+      <div class="card-num">12</div>
+      <div class="card-title lang-text" data-it="Responsabilità dei Giudici" data-en="Judicial Accountability">Responsabilità dei Giudici</div>
+      <div class="card-desc lang-text" data-it="Tre forme di responsabilità: penale, disciplinare e civile per danni." data-en="Three forms of accountability: criminal, disciplinary and civil for damages.">Tre forme di responsabilità: penale, disciplinare e civile per danni.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(12)">
+      <div class="card-accent"></div>
+      <div class="card-num">13</div>
+      <div class="card-title lang-text" data-it="Il Processo Telematico (PCT)" data-en="The Digital Court Process (PCT)">Il Processo Telematico (PCT)</div>
+      <div class="card-desc lang-text" data-it="La digitalizzazione della giustizia: atti nativi digitali e accesso remoto." data-en="The digitisation of justice: native digital acts and remote access.">La digitalizzazione della giustizia: atti nativi digitali e accesso remoto.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+    <div class="card" onclick="showDetail(13)">
+      <div class="card-accent"></div>
+      <div class="card-num">14</div>
+      <div class="card-title lang-text" data-it="L'Equilibrio del Sistema" data-en="The Balance of the System">L'Equilibrio del Sistema</div>
+      <div class="card-desc lang-text" data-it="I quattro assi: autonomia, garanzie, accountability ed efficienza della giustizia moderna." data-en="The four axes: autonomy, guarantees, accountability and efficiency of modern justice.">I quattro assi: autonomia, garanzie, accountability ed efficienza della giustizia moderna.</div>
+      <div class="card-arrow">→</div>
+    </div>
+
+  </div>
+
+  <div class="home-footer">
+    <p class="lang-text" data-it="L'Architettura della Giustizia — Sistema Giurisdizionale Italiano" data-en="The Architecture of Justice — Italian Judicial System">L'Architettura della Giustizia — Sistema Giurisdizionale Italiano</p>
+  </div>
+</div>
+
+<!-- ===================== DETAIL PAGE ===================== -->
+<div class="page" id="detail-page">
+  <div id="detailContent"></div>
+</div>
+
+<script>
+// ===== DATA =====
+const sections = [
+  {
+    num:"01",
+    title:{it:"La Sentenza come Risultato",en:"The Judgment as Outcome"},
+    lead:{it:"La giurisdizione è il potere dello Stato di applicare la legge ai casi concreti attraverso un giudice indipendente.",en:"Jurisdiction is the power of the State to apply the law to specific cases through an independent judge."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">Il meccanismo fondamentale</div>
+        <div class="block-title">Tre elementi, un risultato</div>
+        <p class="block-text">Il sistema giudiziario produce una <strong>sentenza</strong> — una decisione dotata di forza di legge — combinando tre elementi inscindibili. Senza uno di essi, non esiste vera giurisdizione.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title">La Regola</div><div class="step-text">La legge dettata dallo Stato. È la norma astratta che disciplina i comportamenti: definisce cosa è lecito e cosa non lo è, e quali conseguenze derivano dalla sua violazione.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title">La Lite o il Reato</div><div class="step-text">La trasgressione o il conflitto concreto. È il fatto reale che attiva il meccanismo giudiziario: una controversia tra privati, un atto illecito, un reato penale.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title">Il Giudice Terzo</div><div class="step-text">Il soggetto imparziale che applica la regola al caso concreto. L'Art. 101 della Costituzione stabilisce che i giudici sono soggetti soltanto alla legge, escludendo interferenze di qualsiasi altro potere.</div></div></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Principio fondamentale</div>
+          <p>La giurisdizione <em>non crea</em> le regole; garantisce che siano rispettate, in totale indipendenza da ogni altro potere dello Stato. Questa distinzione separa il potere giudiziario dal legislativo e dall'esecutivo.</p>
+        </div>
+        <div class="pull-quote">"La sentenza è la decisione in forza di legge: quando diventa definitiva, nessuno può più metterla in discussione."</div>
+        <p class="block-text">Il risultato finale — la sentenza — acquisisce la cosiddetta <strong>forza del giudicato</strong>: una volta esauriti tutti i gradi di impugnazione, diventa definitiva e immutabile. Questo principio garantisce la certezza del diritto e la stabilità delle decisioni giudiziarie.</p>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The fundamental mechanism</div>
+        <div class="block-title">Three elements, one outcome</div>
+        <p class="block-text">The judicial system produces a <strong>judgment</strong> — a decision with the force of law — by combining three inseparable elements. Without one of them, true jurisdiction does not exist.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title">The Rule</div><div class="step-text">The law dictated by the State. It is the abstract norm that regulates behaviour: it defines what is lawful and what is not, and what consequences follow from its violation.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title">The Dispute or Crime</div><div class="step-text">The concrete transgression or conflict. It is the real fact that activates the judicial mechanism: a dispute between private parties, an unlawful act, a criminal offence.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title">The Impartial Judge</div><div class="step-text">The impartial subject who applies the rule to the specific case. Art. 101 of the Constitution establishes that judges are subject only to the law, excluding interference from any other power.</div></div></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Fundamental principle</div>
+          <p>Jurisdiction does <em>not create</em> the rules; it ensures they are respected, in total independence from every other State power. This distinction separates judicial power from legislative and executive power.</p>
+        </div>
+        <div class="pull-quote">"The judgment is the decision with the force of law: once it becomes final, no one can challenge it any further."</div>
+        <p class="block-text">The final result — the judgment — acquires the so-called <strong>force of res judicata</strong>: once all avenues of appeal are exhausted, it becomes definitive and immutable. This principle guarantees legal certainty and the stability of judicial decisions.</p>
+      </div>`
+    }
+  },
+  {
+    num:"02",
+    title:{it:"La Macchina Giudiziaria",en:"The Judicial Machine"},
+    lead:{it:"Il sistema giudiziario italiano si divide in giurisdizione ordinaria e giurisdizione speciale, ciascuna con specifici ambiti di competenza.",en:"The Italian judicial system is divided into ordinary jurisdiction and special jurisdiction, each with specific areas of competence."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">I due rami principali</div>
+        <div class="block-title">Ordinaria vs Speciale</div>
+        <p class="block-text">Non tutti i conflitti vengono risolti dallo stesso tipo di tribunale. Il legislatore costituente ha previsto un sistema articolato per rispondere alle diverse esigenze della società.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Giurisdizione Ordinaria</div>
+            <div class="compare-item"><strong>Civile</strong>Tutela dei diritti soggettivi e risoluzione di liti tra privati. Contratti, proprietà, famiglia, successioni.</div>
+            <div class="compare-item"><strong>Penale</strong>Accertamento dei reati e applicazione delle pene. Interviene quando una condotta viola norme penali dello Stato.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Giurisdizione Speciale</div>
+            <div class="compare-item"><strong>Amministrativa</strong>TAR e Consiglio di Stato. Gestisce i conflitti tra cittadini e Pubblica Amministrazione.</div>
+            <div class="compare-item"><strong>Contabile</strong>Corte dei Conti. Controlla la corretta gestione del denaro pubblico da parte degli amministratori.</div>
+            <div class="compare-item"><strong>Militare</strong>Tribunali militari. Competente per i reati commessi da militari nell'esercizio delle loro funzioni.</div>
+          </div>
+        </div>
+        <div class="info-box rust">
+          <div class="info-box-title">Art. 102 Costituzione</div>
+          <p>La Costituzione vieta espressamente la creazione di nuovi giudici speciali. Sono ammessi solo quelli già previsti al momento dell'entrata in vigore della Carta: questa norma protegge il sistema da proliferazioni di corti parallele.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The two main branches</div>
+        <div class="block-title">Ordinary vs Special</div>
+        <p class="block-text">Not all conflicts are resolved by the same type of court. The constitutional legislator established an articulated system to respond to the diverse needs of society.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Ordinary Jurisdiction</div>
+            <div class="compare-item"><strong>Civil</strong>Protection of subjective rights and resolution of disputes between private parties. Contracts, property, family, successions.</div>
+            <div class="compare-item"><strong>Criminal</strong>Ascertainment of crimes and application of penalties. Intervenes when conduct violates criminal law.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Special Jurisdiction</div>
+            <div class="compare-item"><strong>Administrative</strong>TAR and Council of State. Handles conflicts between citizens and the Public Administration.</div>
+            <div class="compare-item"><strong>Accounting</strong>Court of Auditors. Controls the correct management of public money by administrators.</div>
+            <div class="compare-item"><strong>Military</strong>Military tribunals. Competent for crimes committed by military personnel in the exercise of their duties.</div>
+          </div>
+        </div>
+        <div class="info-box rust">
+          <div class="info-box-title">Art. 102 of the Constitution</div>
+          <p>The Constitution expressly prohibits the creation of new special courts. Only those already provided for at the time of the Constitution's entry into force are permitted: this rule protects the system from a proliferation of parallel courts.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"03",
+    title:{it:"Civile vs Penale",en:"Civil vs Criminal"},
+    lead:{it:"Due binari paralleli della giustizia ordinaria, con regole, attori e obiettivi profondamente diversi.",en:"Two parallel tracks of ordinary justice, with profoundly different rules, actors and objectives."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">I due grandi rami</div>
+        <div class="block-title">Una distinzione fondamentale</div>
+        <p class="block-text">Capire la differenza tra processo civile e penale è essenziale per orientarsi nel sistema giudiziario. Nonostante entrambi si svolgano davanti ai tribunali ordinari, sono profondamente diversi per natura, attori e finalità.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">⚖️ Civile</div>
+            <div class="compare-item"><strong>Oggetto</strong>Controversie di diritto privato: contratti, proprietà, responsabilità extracontrattuale, diritto di famiglia.</div>
+            <div class="compare-item"><strong>Attori</strong>Attore (chi agisce in giudizio) contro Convenuto (chi viene citato). Entrambi sono soggetti privati.</div>
+            <div class="compare-item"><strong>Obiettivo</strong>Risoluzione della controversia o risarcimento del danno. L'azione è disponibile: il privato sceglie se agire o no.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">⚖️ Penale</div>
+            <div class="compare-item"><strong>Oggetto</strong>Accertamento di un reato e della responsabilità penale personale dell'imputato.</div>
+            <div class="compare-item"><strong>Attori</strong>Pubblico Ministero (che rappresenta lo Stato) contro l'Imputato. Il PM è un magistrato con obbligo di agire.</div>
+            <div class="compare-item"><strong>Obiettivo</strong>Applicazione della pena o proscioglimento. L'azione penale è obbligatoria: il PM non può rinunciare a perseguire i reati.</div>
+          </div>
+        </div>
+        <div class="info-box navy">
+          <div class="info-box-title">L'obbligatorietà dell'azione penale</div>
+          <p>A differenza del processo civile, dove il cittadino sceglie se intentare causa, nel penale il Pubblico Ministero ha l'<strong>obbligo costituzionale</strong> di esercitare l'azione penale ogni volta che ricorrono i presupposti. Questo principio è sancito dall'Art. 112 della Costituzione e garantisce l'uguaglianza di tutti davanti alla legge penale.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The two main branches</div>
+        <div class="block-title">A fundamental distinction</div>
+        <p class="block-text">Understanding the difference between civil and criminal proceedings is essential for navigating the judicial system. Despite both taking place before ordinary courts, they are profoundly different in nature, actors and purpose.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">⚖️ Civil</div>
+            <div class="compare-item"><strong>Subject matter</strong>Private law disputes: contracts, property, tort liability, family law.</div>
+            <div class="compare-item"><strong>Actors</strong>Claimant (who brings the action) versus Defendant (who is sued). Both are private individuals.</div>
+            <div class="compare-item"><strong>Objective</strong>Resolution of the dispute or compensation for damage. The action is discretionary: the private party chooses whether to act.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">⚖️ Criminal</div>
+            <div class="compare-item"><strong>Subject matter</strong>Ascertainment of a crime and the personal criminal liability of the defendant.</div>
+            <div class="compare-item"><strong>Actors</strong>Public Prosecutor (representing the State) versus the Defendant. The prosecutor is a magistrate with an obligation to act.</div>
+            <div class="compare-item"><strong>Objective</strong>Application of a sentence or acquittal. Criminal action is mandatory: the prosecutor cannot give up prosecuting crimes.</div>
+          </div>
+        </div>
+        <div class="info-box navy">
+          <div class="info-box-title">The mandatory nature of criminal action</div>
+          <p>Unlike civil proceedings, where the citizen chooses whether to sue, in criminal proceedings the Public Prosecutor has a <strong>constitutional obligation</strong> to exercise criminal action whenever the conditions are met. This principle is enshrined in Art. 112 of the Constitution and guarantees equality before criminal law.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"04",
+    title:{it:"I Gradi di Giudizio",en:"Degrees of Judgment"},
+    lead:{it:"Il sistema italiano prevede tre gradi di giudizio che garantiscono al cittadino la possibilità di far riesaminare le decisioni sfavorevoli.",en:"The Italian system provides three degrees of judgment that guarantee citizens the possibility of having unfavourable decisions reviewed."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">La struttura ricorsiva</div>
+        <div class="block-title">Dal fatto alla legge</div>
+        <p class="block-text">Il sistema a tre gradi non è semplicemente una garanzia per il cittadino: è il meccanismo che garantisce sia la correttezza della singola decisione (nei gradi di merito) sia l'uniformità applicativa del diritto su tutto il territorio nazionale (in Cassazione).</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title">Primo Grado — Giudizio di Merito</div><div class="step-text">Il tribunale di primo grado accerta i fatti, esamina le prove e emette la prima decisione. È il cuore dell'accertamento fattuale: qui si formano le prove nel contraddittorio tra le parti.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title">Appello — Secondo Grado di Merito</div><div class="step-text">La Corte d'Appello riesamina sia i fatti che il diritto applicato. Non si tratta di un nuovo processo ex novo, ma di una revisione critica della sentenza di primo grado, dove la parte soccombente contesta errori di fatto o di diritto.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title">Cassazione — Giudizio di Legittimità</div><div class="step-text">La Corte di Cassazione non riesamina i fatti (non è un terzo grado di merito). Controlla esclusivamente che la legge sia stata interpretata e applicata correttamente. È il garante dell'uniformità del diritto in tutta Italia.</div></div></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">La Forza del Giudicato</div>
+          <p>Quando una sentenza non può più essere impugnata — perché tutti i gradi sono stati esauriti o i termini per ricorrere sono scaduti — acquista la "forza del giudicato": diventa definitiva e immutabile. Nessuno può più metterla in discussione.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The recursive structure</div>
+        <div class="block-title">From facts to law</div>
+        <p class="block-text">The three-tier system is not simply a guarantee for citizens: it is the mechanism that ensures both the correctness of individual decisions (in the merit courts) and uniform application of the law across the entire country (in Cassation).</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title">First Degree — Judgment on the Merits</div><div class="step-text">The court of first instance ascertains the facts, examines the evidence and issues the first decision. This is the heart of factual ascertainment: evidence is formed here through adversarial proceedings between the parties.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title">Appeal — Second Degree on the Merits</div><div class="step-text">The Court of Appeal reviews both the facts and the law applied. This is not an entirely new trial, but a critical review of the first-instance judgment, where the losing party contests errors of fact or law.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title">Cassation — Legitimacy Review</div><div class="step-text">The Court of Cassation does not re-examine the facts (it is not a third degree on the merits). It controls exclusively whether the law was correctly interpreted and applied. It is the guarantor of legal uniformity throughout Italy.</div></div></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">The Force of Res Judicata</div>
+          <p>When a judgment can no longer be appealed — because all degrees have been exhausted or the appeal deadlines have expired — it acquires "the force of res judicata": it becomes definitive and immutable. No one can challenge it any further.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"05",
+    title:{it:"La Mappa dei Processi",en:"Map of Proceedings"},
+    lead:{it:"A seconda della materia e della gravità, i processi seguono percorsi diversi attraverso il sistema giudiziario.",en:"Depending on the subject matter and severity, proceedings follow different paths through the judicial system."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">I percorsi processuali</div>
+        <div class="block-title">Ogni causa ha la sua via</div>
+        <p class="block-text">Il sistema italiano non è monolitico: esistono percorsi differenziati in base alla natura del reato/controversia, all'età degli imputati e alla materia trattata.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">A</div><div class="step-content"><div class="step-title">Penale Minore / Civile</div><div class="step-text"><strong>Primo grado:</strong> Giudice di Pace (cause di minor valore o reati minori) oppure Tribunale (cause più importanti). <strong>Secondo grado:</strong> Corte d'Appello per entrambi i percorsi. Poi Cassazione.</div></div></div>
+          <div class="step"><div class="step-num">B</div><div class="step-content"><div class="step-title">Penale Grave</div><div class="step-text"><strong>Primo grado:</strong> Corte d'Assise, composta da giudici togati e popolari, per i reati più gravi (omicidio, rapina aggravata, ecc.). <strong>Secondo grado:</strong> Corte d'Assise d'Appello. Poi Cassazione.</div></div></div>
+          <div class="step"><div class="step-num">C</div><div class="step-content"><div class="step-title">Minorile</div><div class="step-text"><strong>Primo grado:</strong> Tribunale per i Minorenni, con composizione speciale (giudici togati + esperti). <strong>Secondo grado:</strong> Corte d'Appello (sezione minori). Poi Cassazione. Percorso dedicato con attenzione alla rieducazione.</div></div></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">La Corte d'Assise</div>
+          <p>È l'unica corte italiana a composizione mista: due giudici togati (magistrati di carriera) e sei giudici popolari (cittadini estratti a sorte). Questa composizione, per i reati più gravi, garantisce la partecipazione dei cittadini all'amministrazione della giustizia.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">Procedural paths</div>
+        <div class="block-title">Every case has its route</div>
+        <p class="block-text">The Italian system is not monolithic: there are differentiated paths based on the nature of the crime/dispute, the age of defendants and the subject matter.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">A</div><div class="step-content"><div class="step-title">Minor Criminal / Civil</div><div class="step-text"><strong>First degree:</strong> Justice of the Peace (minor value cases or minor offences) or Tribunal (more significant cases). <strong>Second degree:</strong> Court of Appeal for both paths. Then Cassation.</div></div></div>
+          <div class="step"><div class="step-num">B</div><div class="step-content"><div class="step-title">Serious Criminal</div><div class="step-text"><strong>First degree:</strong> Court of Assizes, composed of professional and lay judges, for the most serious crimes (murder, aggravated robbery, etc.). <strong>Second degree:</strong> Court of Assizes of Appeal. Then Cassation.</div></div></div>
+          <div class="step"><div class="step-num">C</div><div class="step-content"><div class="step-title">Juvenile</div><div class="step-text"><strong>First degree:</strong> Juvenile Court, with special composition (professional judges + experts). <strong>Second degree:</strong> Court of Appeal (juvenile section). Then Cassation. Dedicated path focused on re-education.</div></div></div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">The Court of Assizes</div>
+          <p>It is the only Italian court with mixed composition: two professional judges (career magistrates) and six lay judges (citizens drawn by lot). This composition, for the most serious crimes, guarantees citizen participation in the administration of justice.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"06",
+    title:{it:"La Corte di Cassazione",en:"The Court of Cassation"},
+    lead:{it:"Il massimo organo della giurisdizione ordinaria non rifà il processo: garantisce che la legge sia applicata uniformemente in tutta Italia.",en:"The supreme body of ordinary jurisdiction does not retry the case: it ensures that the law is applied uniformly throughout Italy."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">L'organo di vertice</div>
+        <div class="block-title">Il guardiano della legge</div>
+        <p class="block-text">Spesso fraintesa come "terzo grado di giudizio", la Cassazione ha in realtà una funzione radicalmente diversa dagli altri gradi: non riesamina i fatti del caso, ma controlla se la legge è stata correttamente interpretata.</p>
+        <div class="info-box">
+          <div class="info-box-title">Cosa fa la Cassazione</div>
+          <p>Riceve le sentenze d'appello e le sottopone a un <strong>esame di legittimità</strong>: verifica che non vi siano stati errori nell'applicazione del diritto. Non valuta "chi ha ragione nei fatti", ma "se il giudice ha applicato bene la legge".</p>
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">✓ Cosa fa</div>
+            <div class="compare-item"><strong>Controlla</strong>Che la legge sia stata interpretata correttamente dal giudice d'appello.</div>
+            <div class="compare-item"><strong>Annulla</strong>Le sentenze viziate da errori di diritto e le rinvia ad altro giudice di merito.</div>
+            <div class="compare-item"><strong>Uniforma</strong>Garantisce che la stessa norma sia applicata allo stesso modo in tutto il territorio nazionale.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">✗ Cosa non fa</div>
+            <div class="compare-item"><strong>Non rivaluta</strong>I fatti del caso già accertati dai giudici di merito.</div>
+            <div class="compare-item"><strong>Non risentono</strong>I testimoni né dispone nuove indagini.</div>
+            <div class="compare-item"><strong>Non decide</strong>Nel merito: se annulla, rinvia sempre ad un altro giudice per la nuova decisione nel merito.</div>
+          </div>
+        </div>
+        <div class="pull-quote">"La Cassazione non rifà il processo. Garantisce che la legge sia applicata in modo uniforme in tutta Italia."</div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The apex body</div>
+        <div class="block-title">The guardian of the law</div>
+        <p class="block-text">Often misunderstood as a "third degree of judgment", the Cassation Court actually has a radically different function from other courts: it does not re-examine the facts of the case, but checks whether the law was correctly interpreted.</p>
+        <div class="info-box">
+          <div class="info-box-title">What Cassation does</div>
+          <p>It receives appeal judgments and subjects them to a <strong>legitimacy review</strong>: it verifies that there were no errors in applying the law. It does not assess "who is right on the facts", but "whether the judge applied the law correctly".</p>
+        </div>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">✓ What it does</div>
+            <div class="compare-item"><strong>Controls</strong>That the law was correctly interpreted by the appeal judge.</div>
+            <div class="compare-item"><strong>Annuls</strong>Judgments flawed by errors of law and refers them back to another merit court.</div>
+            <div class="compare-item"><strong>Uniformity</strong>Ensures the same rule is applied the same way throughout the country.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">✗ What it does not do</div>
+            <div class="compare-item"><strong>Does not re-evaluate</strong>The facts already established by the merit courts.</div>
+            <div class="compare-item"><strong>Does not re-hear</strong>Witnesses or order new investigations.</div>
+            <div class="compare-item"><strong>Does not decide</strong>On the merits: if it annuls, it always refers back to another judge for a new decision on the merits.</div>
+          </div>
+        </div>
+        <div class="pull-quote">"The Court of Cassation does not retry the case. It guarantees that the law is applied uniformly throughout Italy."</div>
+      </div>`
+    }
+  },
+  {
+    num:"07",
+    title:{it:"Il CSM",en:"The CSM"},
+    lead:{it:"Il Consiglio Superiore della Magistratura è l'organo di autogoverno della magistratura, creato per garantire l'indipendenza dei giudici dal potere esecutivo.",en:"The Superior Council of the Judiciary is the self-governing body of the judiciary, created to guarantee judges' independence from the executive power."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">L'organo di autogoverno</div>
+        <div class="block-title">Chi governa i magistrati</div>
+        <p class="block-text">In uno Stato di diritto, i magistrati devono essere indipendenti non solo formalmente ma anche nella loro carriera. Il CSM nasce proprio per questo: gestire le carriere dei giudici senza che il governo possa influenzarle.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Composizione (33 membri)</div>
+            <div class="compare-item"><strong>Membri di Diritto (3)</strong>Presidente della Repubblica (Presidente del CSM), Primo Presidente della Cassazione, Procuratore Generale della Cassazione.</div>
+            <div class="compare-item"><strong>Membri Togati (20)</strong>Eletti da e tra i magistrati ordinari in esercizio. Rappresentano la componente professionale.</div>
+            <div class="compare-item"><strong>Membri Laici (10)</strong>Eletti dal Parlamento in seduta comune tra professori ordinari di università in materie giuridiche e avvocati con 15 anni di esercizio.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Funzioni principali</div>
+            <div class="compare-item"><strong>Assunzioni</strong>Gestisce i concorsi e l'accesso alla magistratura.</div>
+            <div class="compare-item"><strong>Trasferimenti</strong>Decide gli spostamenti dei magistrati tra le sedi.</div>
+            <div class="compare-item"><strong>Promozioni</strong>Delibera sugli avanzamenti di carriera.</div>
+            <div class="compare-item"><strong>Procedimenti disciplinari</strong>Sanziona i comportamenti scorretti dei magistrati.</div>
+          </div>
+        </div>
+        <div class="info-box navy">
+          <div class="info-box-title">Art. 104 Costituzione</div>
+          <p>Il CSM è un organo di rilievo costituzionale creato espressamente per <strong>escludere le interferenze del potere esecutivo</strong> sull'organizzazione e sulle carriere della magistratura. Il Presidente della Repubblica lo presiede proprio per sottolineare l'alto valore istituzionale dell'indipendenza giudiziaria.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The self-governing body</div>
+        <div class="block-title">Who governs the judges</div>
+        <p class="block-text">In a rule-of-law state, magistrates must be independent not only formally but also in their careers. The CSM was created precisely for this: to manage judges' careers without the government being able to influence them.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Composition (33 members)</div>
+            <div class="compare-item"><strong>Ex officio members (3)</strong>President of the Republic (Chair of the CSM), First President of the Cassation Court, Prosecutor General of the Cassation Court.</div>
+            <div class="compare-item"><strong>Judicial members (20)</strong>Elected by and from ordinary practising magistrates. They represent the professional component.</div>
+            <div class="compare-item"><strong>Lay members (10)</strong>Elected by Parliament in joint session from among full university professors in legal subjects and lawyers with 15 years of practice.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Main functions</div>
+            <div class="compare-item"><strong>Recruitment</strong>Manages competitions and access to the judiciary.</div>
+            <div class="compare-item"><strong>Transfers</strong>Decides on magistrates' movements between positions.</div>
+            <div class="compare-item"><strong>Promotions</strong>Deliberates on career advancement.</div>
+            <div class="compare-item"><strong>Disciplinary proceedings</strong>Sanctions misconduct by magistrates.</div>
+          </div>
+        </div>
+        <div class="info-box navy">
+          <div class="info-box-title">Art. 104 of the Constitution</div>
+          <p>The CSM is a constitutionally significant body created expressly to <strong>exclude executive power interference</strong> in the organisation and careers of the judiciary. The President of the Republic chairs it precisely to underline the high institutional value of judicial independence.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"08",
+    title:{it:"Giudice vs PM: La Carriera",en:"Judge vs Prosecutor: Career"},
+    lead:{it:"Attualmente giudici e pubblici ministeri appartengono allo stesso ordine e possono transitare da una funzione all'altra. Questo sistema è al centro del dibattito sulla riforma.",en:"Currently judges and public prosecutors belong to the same order and can move between functions. This system is at the centre of the reform debate."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">Il sistema attuale</div>
+        <div class="block-title">Una carriera, due ruoli</div>
+        <p class="block-text">Nel sistema vigente, il magistrato entra nell'ordine giudiziario tramite un unico concorso e può, nel corso della sua carriera, esercitare sia funzioni giudicanti che requirenti (con alcune limitazioni nel numero di passaggi).</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Il Giudice (Giudicante)</div>
+            <div class="compare-item"><strong>Funzione</strong>Dirige il processo, valuta le prove in modo imparziale ed emette la sentenza.</div>
+            <div class="compare-item"><strong>Caratteristica</strong>Terzo e imparziale: non è parte nel processo, ma arbitro super partes.</div>
+            <div class="compare-item"><strong>Posizione</strong>Al di sopra delle parti, garantisce il contraddittorio e decide.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Il PM (Requirente)</div>
+            <div class="compare-item"><strong>Funzione</strong>Rappresenta l'accusa, guida le indagini preliminari (sotto il controllo del GIP), richiede condanna o assoluzione.</div>
+            <div class="compare-item"><strong>Caratteristica</strong>È parte nel processo: ha una tesi da sostenere, quella dell'accusa.</div>
+            <div class="compare-item"><strong>Posizione</strong>Contrapposto alla difesa nel contraddittorio.</div>
+          </div>
+        </div>
+        <div class="info-box rust">
+          <div class="info-box-title">Il problema della carriera unica</div>
+          <p>I critici sostengono che chi ha svolto per anni il ruolo di accusatore (PM) porterà con sé, anche diventando giudice, una mentalità orientata all'accusa. Questo comprometterebbe la terzietà del giudice. I sostenitori del sistema attuale rispondono che la doppia esperienza arricchisce la professionalità e che le garanzie formali sono sufficienti.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The current system</div>
+        <div class="block-title">One career, two roles</div>
+        <p class="block-text">Under the current system, a magistrate enters the judicial order through a single competitive examination and can, during their career, exercise both judicial and prosecutorial functions (with some limitations on the number of transitions).</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">The Judge</div>
+            <div class="compare-item"><strong>Function</strong>Directs the proceedings, impartially evaluates the evidence and issues the judgment.</div>
+            <div class="compare-item"><strong>Characteristic</strong>Third and impartial: not a party to the proceedings, but a neutral arbiter.</div>
+            <div class="compare-item"><strong>Position</strong>Above the parties, guarantees adversarial process and decides.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">The Prosecutor (PM)</div>
+            <div class="compare-item"><strong>Function</strong>Represents the prosecution, leads preliminary investigations (under the supervision of the GIP), requests conviction or acquittal.</div>
+            <div class="compare-item"><strong>Characteristic</strong>Is a party to the proceedings: has a thesis to support, that of the prosecution.</div>
+            <div class="compare-item"><strong>Position</strong>Opposed to the defence in adversarial proceedings.</div>
+          </div>
+        </div>
+        <div class="info-box rust">
+          <div class="info-box-title">The problem of the unified career</div>
+          <p>Critics argue that someone who has spent years as a prosecutor (PM) will carry with them, even as a judge, a prosecution-oriented mindset. This would compromise the judge's impartiality. Supporters of the current system respond that dual experience enriches professionalism and that formal safeguards are sufficient.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"09",
+    title:{it:"La Riforma: Referendum",en:"The Reform: Referendum"},
+    lead:{it:"La riforma referendaria propone la separazione netta delle carriere tra giudici e PM, con due CSM distinti e nessuna mobilità tra le funzioni.",en:"The referendum reform proposes a clear separation of careers between judges and prosecutors, with two separate CSMs and no mobility between functions."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">Status quo vs riforma</div>
+        <div class="block-title">Cosa cambierebbe</div>
+        <p class="block-text">La riforma proposta con il referendum costituzionale introduce modifiche strutturali profonde al sistema della magistratura italiana. Non riguarda le regole processuali — quelle restano invariate — ma l'architettura istituzionale della magistratura.</p>
+        <div class="reform-toggle">
+          <div class="reform-panel active-panel">
+            <div class="reform-panel-tag lang-text" data-it="Oggi — Status Quo" data-en="Today — Status Quo">Oggi — Status Quo</div>
+            <div class="reform-panel-title lang-text" data-it="Sistema unificato" data-en="Unified system">Sistema unificato</div>
+            <ul>
+              <li><strong>Unico Ordine:</strong> Giudici e PM appartengono alla stessa carriera e allo stesso ordine giudiziario.</li>
+              <li><strong>Governo:</strong> Un solo CSM gestisce tutta la magistratura ordinaria.</li>
+              <li><strong>Mobilità:</strong> Possibilità di passare dalla funzione giudicante a quella requirente e viceversa (con limiti).</li>
+              <li><strong>Disciplinare:</strong> I procedimenti disciplinari sono gestiti da una sezione del CSM.</li>
+            </ul>
+          </div>
+          <div class="reform-panel">
+            <div class="reform-panel-tag lang-text" data-it="La Riforma" data-en="The Reform">La Riforma</div>
+            <div class="reform-panel-title lang-text" data-it="Separazione delle carriere" data-en="Separation of careers">Separazione delle carriere</div>
+            <ul>
+              <li><strong>Due Ordini:</strong> Giudici e PM percorsi professionali nettamente distinti fin dall'inizio.</li>
+              <li><strong>Due CSM:</strong> Un CSM Giudicante e un CSM Requirente separati.</li>
+              <li><strong>Nessuna mobilità:</strong> Nessun passaggio consentito tra le due funzioni.</li>
+              <li><strong>Sorteggio:</strong> I membri togati del CSM scelti per sorteggio per limitare il peso delle "correnti".</li>
+            </ul>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Cosa NON cambia con la riforma</div>
+          <p>La riforma riguarda esclusivamente l'organizzazione istituzionale della magistratura. <strong>Non modifica</strong> le regole dei processi, i poteri di accusa e difesa nel dibattimento, né la durata delle cause.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">Status quo vs reform</div>
+        <div class="block-title">What would change</div>
+        <p class="block-text">The reform proposed by the constitutional referendum introduces profound structural changes to the Italian judiciary system. It does not affect procedural rules — those remain unchanged — but the institutional architecture of the judiciary.</p>
+        <div class="reform-toggle">
+          <div class="reform-panel active-panel">
+            <div class="reform-panel-tag">Today — Status Quo</div>
+            <div class="reform-panel-title">Unified system</div>
+            <ul>
+              <li><strong>Single Order:</strong> Judges and prosecutors belong to the same career and the same judicial order.</li>
+              <li><strong>Governance:</strong> A single CSM manages all ordinary magistracy.</li>
+              <li><strong>Mobility:</strong> Possibility of moving from judicial to prosecutorial function and vice versa (with limits).</li>
+              <li><strong>Disciplinary:</strong> Disciplinary proceedings managed by a section of the CSM.</li>
+            </ul>
+          </div>
+          <div class="reform-panel">
+            <div class="reform-panel-tag">The Reform</div>
+            <div class="reform-panel-title">Separation of careers</div>
+            <ul>
+              <li><strong>Two Orders:</strong> Judges and prosecutors with clearly distinct professional paths from the start.</li>
+              <li><strong>Two CSMs:</strong> A separate Judicial CSM and a Prosecutorial CSM.</li>
+              <li><strong>No mobility:</strong> No movement permitted between the two functions.</li>
+              <li><strong>Lottery:</strong> Judicial CSM members chosen by lot to limit the influence of "factions".</li>
+            </ul>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">What does NOT change with the reform</div>
+          <p>The reform relates exclusively to the institutional organisation of the judiciary. It does <strong>not modify</strong> the rules of proceedings, the powers of prosecution and defence at trial, nor the duration of cases.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"10",
+    title:{it:"Procedimenti Disciplinari",en:"Disciplinary Proceedings"},
+    lead:{it:"La riforma introduce una nuova Alta Corte Disciplinare per gestire i procedimenti a carico dei magistrati, separata dal CSM.",en:"The reform introduces a new High Disciplinary Court to handle proceedings against magistrates, separate from the CSM."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">Il sistema disciplinare</div>
+        <div class="block-title">Chi controlla i giudici</div>
+        <p class="block-text">Un sistema giudiziario credibile deve essere in grado di sanzionare i propri componenti quando si comportano in modo scorretto, mantenendo allo stesso tempo l'indipendenza da interferenze esterne.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Oggi — CSM</div>
+            <div class="compare-item"><strong>Chi decide</strong>Una sezione disciplinare del CSM, composta da membri togati e laici.</div>
+            <div class="compare-item"><strong>Limite</strong>Chi giudica disciplinarmente un magistrato è lo stesso organo che gestisce le sue promozioni e trasferimenti. Possibile conflitto di interessi.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Riforma — Alta Corte</div>
+            <div class="compare-item"><strong>Composizione</strong>15 membri totali: 9 magistrati sorteggiati con almeno 20 anni di servizio + 6 membri laici.</div>
+            <div class="compare-item"><strong>Presidenza</strong>Il Presidente è scelto tra i membri laici, garantendo una guida non corporativa.</div>
+            <div class="compare-item"><strong>Vantaggio</strong>Separazione tra chi gestisce le carriere (CSM) e chi sanziona i comportamenti (Alta Corte).</div>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">Cosa resta invariato</div>
+          <p>La riforma sull'Alta Corte Disciplinare riguarda l'organizzazione istituzionale. Non cambia le norme sostanziali sui comportamenti sanzionabili, né incide sulle regole processuali del dibattimento.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The disciplinary system</div>
+        <div class="block-title">Who controls the judges</div>
+        <p class="block-text">A credible judicial system must be able to sanction its members when they behave incorrectly, while maintaining independence from external interference.</p>
+        <div class="compare-grid">
+          <div class="compare-col">
+            <div class="compare-col-title">Today — CSM</div>
+            <div class="compare-item"><strong>Who decides</strong>A disciplinary section of the CSM, composed of judicial and lay members.</div>
+            <div class="compare-item"><strong>Limitation</strong>Those who judge a magistrate disciplinarily are the same body that manages their promotions and transfers. Possible conflict of interest.</div>
+          </div>
+          <div class="compare-col dark">
+            <div class="compare-col-title">Reform — High Court</div>
+            <div class="compare-item"><strong>Composition</strong>15 total members: 9 magistrates drawn by lot with at least 20 years of service + 6 lay members.</div>
+            <div class="compare-item"><strong>Presidency</strong>The President is chosen from among the lay members, ensuring non-corporatist leadership.</div>
+            <div class="compare-item"><strong>Advantage</strong>Separation between those who manage careers (CSM) and those who sanction misconduct (High Court).</div>
+          </div>
+        </div>
+        <div class="info-box">
+          <div class="info-box-title">What remains unchanged</div>
+          <p>The High Disciplinary Court reform concerns institutional organisation. It does not change substantive rules on sanctionable conduct, nor does it affect the procedural rules of trial.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"11",
+    title:{it:"Il Giusto Processo",en:"The Fair Trial"},
+    lead:{it:"L'Art. 111 della Costituzione definisce i quattro pilastri irrinunciabili che rendono un processo equo e legittimo.",en:"Art. 111 of the Constitution defines the four indispensable pillars that make a trial fair and legitimate."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">Art. 111 Costituzione</div>
+        <div class="block-title">I quattro pilastri</div>
+        <p class="block-text">Il "giusto processo" non è un concetto astratto: è una precisa norma costituzionale che enumera i requisiti che ogni processo deve rispettare per essere considerato legittimo in uno Stato di diritto.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">I</div><div class="step-content"><div class="step-title">Contraddittorio</div><div class="step-text">Parità di armi tra accusa e difesa. La prova si forma nel processo, attraverso il confronto tra le parti. Nessuna delle due ha vantaggi strutturali: entrambe devono poter produrre prove, esaminare testimoni, replicare alle tesi avversarie.</div></div></div>
+          <div class="step"><div class="step-num">II</div><div class="step-content"><div class="step-title">Terzietà e Imparzialità del Giudice</div><div class="step-text">Il giudice non ha interessi personali nella causa ed è super partes. Non può avere relazioni con le parti, pregiudizi sulla questione o coinvolgimenti precedenti che ne compromettano l'obiettività.</div></div></div>
+          <div class="step"><div class="step-num">III</div><div class="step-content"><div class="step-title">Ragionevole Durata</div><div class="step-text">La giustizia ritardata è giustizia negata. Un processo che dura decenni nega di fatto il diritto alla tutela giurisdizionale. La Costituzione impone che la legge assicuri la ragionevole durata delle procedure.</div></div></div>
+          <div class="step"><div class="step-num">IV</div><div class="step-content"><div class="step-title">Obbligo di Motivazione</div><div class="step-text">Ogni provvedimento del giudice deve essere fondato su logica e diritto e deve essere motivato per scritto. Questo permette alle parti di capire le ragioni della decisione e di impugnarla se ingiusta. Evita decisioni arbitrarie.</div></div></div>
+        </div>
+        <div class="pull-quote">"Un processo giusto è quello in cui le parti si trovano su un piano di parità davanti a un giudice imparziale che decide in tempi ragionevoli."</div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">Art. 111 of the Constitution</div>
+        <div class="block-title">The four pillars</div>
+        <p class="block-text">The "fair trial" is not an abstract concept: it is a precise constitutional norm that enumerates the requirements every trial must meet to be considered legitimate in a rule-of-law state.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">I</div><div class="step-content"><div class="step-title">Adversarial Principle</div><div class="step-text">Equality of arms between prosecution and defence. Evidence is formed during the trial, through confrontation between the parties. Neither has structural advantages: both must be able to produce evidence, examine witnesses, and reply to opposing arguments.</div></div></div>
+          <div class="step"><div class="step-num">II</div><div class="step-content"><div class="step-title">Impartiality of the Judge</div><div class="step-text">The judge has no personal interest in the case and is super partes. They cannot have relationships with the parties, prejudices about the matter, or prior involvement that compromises their objectivity.</div></div></div>
+          <div class="step"><div class="step-num">III</div><div class="step-content"><div class="step-title">Reasonable Duration</div><div class="step-text">Justice delayed is justice denied. A case lasting decades effectively denies the right to judicial protection. The Constitution requires that law ensures reasonable duration of proceedings.</div></div></div>
+          <div class="step"><div class="step-num">IV</div><div class="step-content"><div class="step-title">Obligation to Give Reasons</div><div class="step-text">Every judicial measure must be grounded in logic and law and must be reasoned in writing. This allows parties to understand the reasons for the decision and to appeal if unjust. It prevents arbitrary decisions.</div></div></div>
+        </div>
+        <div class="pull-quote">"A fair trial is one in which the parties are on equal footing before an impartial judge who decides in reasonable time."</div>
+      </div>`
+    }
+  },
+  {
+    num:"12",
+    title:{it:"Responsabilità dei Giudici",en:"Judicial Accountability"},
+    lead:{it:"I magistrati sono soggetti a tre forme di responsabilità: penale, disciplinare e civile per danni, con diverse implicazioni pratiche.",en:"Magistrates are subject to three forms of accountability: criminal, disciplinary and civil for damages, with different practical implications."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">Le tre forme</div>
+        <div class="block-title">Nessuno è al di sopra della legge</div>
+        <p class="block-text">L'indipendenza della magistratura non significa irresponsabilità. I giudici rispondono del loro operato secondo tre distinte modalità, ciascuna con i propri meccanismi e conseguenze.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">P</div><div class="step-content"><div class="step-title">Responsabilità Penale</div><div class="step-text">Se un giudice commette un reato nell'esercizio delle sue funzioni (corruzione, abuso d'ufficio, falso ideologico), è processato come ogni altro cittadino. Non esiste alcun privilegio o immunità di carattere penale per i magistrati.</div></div></div>
+          <div class="step"><div class="step-num">D</div><div class="step-content"><div class="step-title">Responsabilità Disciplinare</div><div class="step-text">Sanzioni per comportamenti scorretti nell'esercizio della funzione giudiziaria: ritardi ingiustificati, violazioni deontologiche, comportamenti lesivi del prestigio dell'ordine. Oggi gestite dal CSM, con la riforma dalla nuova Alta Corte Disciplinare.</div></div></div>
+          <div class="step"><div class="step-num">C</div><div class="step-content"><div class="step-title">Responsabilità Civile per Danni</div><div class="step-text">In caso di dolo, colpa grave o diniego di giustizia, il cittadino leso può ottenere un risarcimento. <strong>Sistema attuale:</strong> il cittadino fa causa allo Stato (che poi si rivale sul giudice). <strong>Proposta referendaria:</strong> responsabilità diretta del magistrato, citabile in giudizio direttamente.</div></div></div>
+        </div>
+        <div class="info-box rust">
+          <div class="info-box-title">Il dibattito sulla responsabilità civile diretta</div>
+          <p>I sostenitori della responsabilità diretta sostengono che renderebbe i giudici più attenti e responsabili. I contrari temono che l'esposizione al rischio di cause civili renderebbe i giudici eccessivamente prudenti e timidi nelle decisioni, compromettendo l'indipendenza della magistratura.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The three forms</div>
+        <div class="block-title">Nobody is above the law</div>
+        <p class="block-text">The independence of the judiciary does not mean unaccountability. Judges answer for their conduct in three distinct ways, each with its own mechanisms and consequences.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">P</div><div class="step-content"><div class="step-title">Criminal Accountability</div><div class="step-text">If a judge commits a crime in the exercise of their functions (corruption, abuse of office, false attestation), they are tried like any other citizen. There is no privilege or criminal immunity for magistrates.</div></div></div>
+          <div class="step"><div class="step-num">D</div><div class="step-content"><div class="step-title">Disciplinary Accountability</div><div class="step-text">Sanctions for misconduct in the exercise of judicial functions: unjustified delays, ethical violations, conduct damaging to the prestige of the order. Currently managed by the CSM, under the reform by the new High Disciplinary Court.</div></div></div>
+          <div class="step"><div class="step-num">C</div><div class="step-content"><div class="step-title">Civil Accountability for Damages</div><div class="step-text">In cases of wilful misconduct, gross negligence or denial of justice, the injured citizen can obtain compensation. <strong>Current system:</strong> the citizen sues the State (which then seeks recourse against the judge). <strong>Referendum proposal:</strong> direct liability of the magistrate, who can be sued directly.</div></div></div>
+        </div>
+        <div class="info-box rust">
+          <div class="info-box-title">The debate on direct civil liability</div>
+          <p>Supporters of direct liability argue it would make judges more careful and accountable. Opponents fear that exposure to civil suits would make judges excessively cautious in their decisions, compromising judicial independence.</p>
+        </div>
+      </div>`
+    }
+  },
+  {
+    num:"13",
+    title:{it:"Il Processo Telematico (PCT)",en:"The Digital Court Process (PCT)"},
+    lead:{it:"Il Processo Civile Telematico trasforma la giustizia italiana con atti nativi digitali, fascicoli informatici e accesso remoto, riducendo i tempi burocratici.",en:"The Digital Civil Process transforms Italian justice with native digital documents, electronic case files and remote access, reducing bureaucratic processing times."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">La digitalizzazione</div>
+        <div class="block-title">La giustizia nell'era digitale</div>
+        <p class="block-text">Il PCT non è una riforma processuale — non cambia le regole del giudizio — ma è un'infrastruttura tecnologica che cambia radicalmente il modo in cui i procedimenti vengono gestiti e i documenti circolano.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title">Atti processuali nativi digitali</div><div class="step-text">Tutti gli atti giudiziari — citazioni, memorie, sentenze — vengono redatti, firmati digitalmente e depositati in formato elettronico. Addio alla carta: il documento digitale è l'originale, non una copia.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title">Fascicoli informatici</div><div class="step-text">Ogni causa ha un fascicolo elettronico accessibile in modo univoco. Avvocati e giudici possono consultare gli atti da remoto, eliminando i tempi morti della cancelleria fisica e le lunghe attese allo sportello.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title">Riduzione dei tempi di cancelleria</div><div class="step-text">Le operazioni di deposito, notifica e comunicazione — tradizionalmente lente — diventano quasi istantanee. Le notifiche agli avvocati avvengono via PEC (Posta Elettronica Certificata), con valore legale equivalente alla raccomandata.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div class="step-content"><div class="step-title">Trasparenza totale</div><div class="step-text">Il sistema consente una tracciabilità completa di tutti i movimenti degli atti. Le parti sanno sempre in quale fase si trova la causa, chi ha consultato il fascicolo e quando è avvenuto ogni deposito.</div></div></div>
+        </div>
+        <div class="pull-quote">"Il PCT non è un nuovo rito, ma un'infrastruttura software che trasforma la velocità e l'accesso alla giustizia."</div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">Digitalisation</div>
+        <div class="block-title">Justice in the digital age</div>
+        <p class="block-text">The PCT is not a procedural reform — it does not change the rules of judgment — but a technological infrastructure that radically changes how proceedings are managed and documents circulate.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">01</div><div class="step-content"><div class="step-title">Native digital procedural acts</div><div class="step-text">All judicial acts — summons, briefs, judgments — are drafted, digitally signed and filed in electronic format. Paper is out: the digital document is the original, not a copy.</div></div></div>
+          <div class="step"><div class="step-num">02</div><div class="step-content"><div class="step-title">Electronic case files</div><div class="step-text">Each case has a uniquely accessible electronic file. Lawyers and judges can consult documents remotely, eliminating dead time at the physical registry and long waits at the counter.</div></div></div>
+          <div class="step"><div class="step-num">03</div><div class="step-content"><div class="step-title">Reduced registry processing times</div><div class="step-text">Filing, service and communication operations — traditionally slow — become almost instantaneous. Notifications to lawyers are sent via PEC (Certified Electronic Mail), with legal value equivalent to registered post.</div></div></div>
+          <div class="step"><div class="step-num">04</div><div class="step-content"><div class="step-title">Full transparency</div><div class="step-text">The system allows complete traceability of all document movements. The parties always know the current stage of the case, who has consulted the file and when each filing occurred.</div></div></div>
+        </div>
+        <div class="pull-quote">"The PCT is not a new procedural form, but a software infrastructure that transforms the speed and accessibility of justice."</div>
+      </div>`
+    }
+  },
+  {
+    num:"14",
+    title:{it:"L'Equilibrio del Sistema",en:"The Balance of the System"},
+    lead:{it:"Una giurisdizione moderna deve bilanciare quattro assi fondamentali: autonomia, garanzie, accountability ed efficienza.",en:"A modern jurisdiction must balance four fundamental axes: autonomy, guarantees, accountability and efficiency."},
+    content:{
+      it:`<div class="content-block">
+        <div class="block-label">La visione d'insieme</div>
+        <div class="block-title">Quattro assi in tensione</div>
+        <p class="block-text">Il sistema giudiziario non può massimizzare un solo valore senza comprometterne altri. L'equilibrio tra questi quattro assi definisce la qualità di una giustizia moderna e democratica.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">①</div><div class="step-content"><div class="step-title">Autonomia — Art. 104 Cost.</div><div class="step-text">Il CSM garantisce che i magistrati siano indipendenti dall'esecutivo. Senza autonomia, i giudici diventerebbero esecutori delle politiche del governo, minando lo stato di diritto. Ma un'autonomia senza controlli può degenerare in corporativismo.</div></div></div>
+          <div class="step"><div class="step-num">②</div><div class="step-content"><div class="step-title">Garanzie — Art. 111 Cost.</div><div class="step-text">Il giusto processo protegge il cittadino da decisioni arbitrarie. Contraddittorio, terzietà, motivazione e durata ragionevole sono non negoziabili. Senza garanzie, l'autonomia giudiziaria diventa arbitrio.</div></div></div>
+          <div class="step"><div class="step-num">③</div><div class="step-content"><div class="step-title">Accountability — Responsabilità</div><div class="step-text">Chi esercita il potere giudiziario deve rispondere del proprio operato: penalmente, disciplinarmente, civilmente. L'accountability bilancia l'indipendenza: i giudici sono autonomi ma non irresponsabili.</div></div></div>
+          <div class="step"><div class="step-num">④</div><div class="step-content"><div class="step-title">Efficienza — PCT</div><div class="step-text">Una giustizia lenta è una giustizia negata. Il Processo Telematico è la risposta tecnologica all'esigenza di efficienza. La digitalizzazione non cambia le regole del gioco ma velocizza la macchina.</div></div></div>
+        </div>
+        <div class="pull-quote">"Una giurisdizione moderna: Indipendente per Costituzione, garantista per legge, digitale per evoluzione."</div>
+        <div class="info-box">
+          <div class="info-box-title">Il messaggio finale</div>
+          <p>Ogni riforma del sistema giudiziario è un tentativo di ribilanciare questi quattro assi. La separazione delle carriere punta sull'autonomia e le garanzie; la responsabilità civile diretta sull'accountability; il PCT sull'efficienza. La sfida è non perdere di vista l'equilibrio complessivo.</p>
+        </div>
+      </div>`,
+      en:`<div class="content-block">
+        <div class="block-label">The overall picture</div>
+        <div class="block-title">Four axes in tension</div>
+        <p class="block-text">The judicial system cannot maximise one value without compromising others. The balance between these four axes defines the quality of modern, democratic justice.</p>
+        <div class="steps">
+          <div class="step"><div class="step-num">①</div><div class="step-content"><div class="step-title">Autonomy — Art. 104 Const.</div><div class="step-text">The CSM ensures magistrates are independent from the executive. Without autonomy, judges would become executors of government policy, undermining the rule of law. But autonomy without checks can degenerate into corporatism.</div></div></div>
+          <div class="step"><div class="step-num">②</div><div class="step-content"><div class="step-title">Guarantees — Art. 111 Const.</div><div class="step-text">The fair trial protects citizens from arbitrary decisions. Adversarial process, impartiality, reasoning and reasonable duration are non-negotiable. Without guarantees, judicial autonomy becomes arbitrariness.</div></div></div>
+          <div class="step"><div class="step-num">③</div><div class="step-content"><div class="step-title">Accountability</div><div class="step-text">Those who exercise judicial power must answer for their conduct: criminally, disciplinarily, civilly. Accountability balances independence: judges are autonomous but not unaccountable.</div></div></div>
+          <div class="step"><div class="step-num">④</div><div class="step-content"><div class="step-title">Efficiency — PCT</div><div class="step-text">Slow justice is denied justice. The Digital Court Process is the technological response to the need for efficiency. Digitalisation does not change the rules of the game but speeds up the machine.</div></div></div>
+        </div>
+        <div class="pull-quote">"A modern jurisdiction: Independent by Constitution, rights-protecting by law, digital by evolution."</div>
+        <div class="info-box">
+          <div class="info-box-title">The final message</div>
+          <p>Every judicial reform is an attempt to rebalance these four axes. Career separation targets autonomy and guarantees; direct civil liability targets accountability; the PCT targets efficiency. The challenge is not to lose sight of the overall balance.</p>
+        </div>
+      </div>`
+    }
+  }
+];
+
+// ===== STATE =====
+let currentLang = 'it';
+let currentIndex = 0;
+
+// ===== LANGUAGE =====
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  document.querySelectorAll('.lang-text').forEach(el => {
+    el.innerHTML = el.getAttribute('data-' + lang) || el.innerHTML;
+  });
+  const dp = document.getElementById('detail-page');
+  if(dp.classList.contains('active')) {
+    renderDetail(currentIndex);
+  }
+}
+
+// ===== NAVIGATION =====
+function showHome() {
+  document.getElementById('home-page').classList.add('active');
+  document.getElementById('detail-page').classList.remove('active');
+  document.getElementById('backBtn').classList.remove('visible');
+  window.scrollTo(0,0);
+}
+
+function showDetail(index) {
+  currentIndex = index;
+  renderDetail(index);
+  document.getElementById('home-page').classList.remove('active');
+  document.getElementById('detail-page').classList.add('active');
+  document.getElementById('backBtn').classList.add('visible');
+  window.scrollTo(0,0);
+}
+
+function renderDetail(index) {
+  const s = sections[index];
+  const lang = currentLang;
+  const prev = index > 0 ? index - 1 : null;
+  const next = index < sections.length - 1 ? index + 1 : null;
+
+  const prevBtn = prev !== null
+    ? `<button class="nav-btn" onclick="showDetail(${prev})">← ${sections[prev].title[lang]}</button>`
+    : '';
+  const nextBtn = next !== null
+    ? `<button class="nav-btn primary" onclick="showDetail(${next})">→ ${sections[next].title[lang]}</button>`
+    : `<button class="nav-btn primary" onclick="showHome()">${lang==='it'?'↩ Torna alla home':'↩ Back to home'}</button>`;
+
+  document.getElementById('detailContent').innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-chapter">${s.num} / ${sections.length}</div>
+      <h2>${s.title[lang]}</h2>
+      <p class="detail-lead">${s.lead[lang]}</p>
+    </div>
+    <div class="detail-body">
+      ${s.content[lang]}
+    </div>
+    <div class="nav-footer">
+      <div class="nav-footer-text lang-text" data-it="Navigazione sezioni" data-en="Section navigation">${lang==='it'?'Navigazione sezioni':'Section navigation'}</div>
+      <div class="nav-btns">${prevBtn}${nextBtn}</div>
+    </div>
+  `;
+}
+
+// ===== CARD HOVER ANIMATIONS with delay =====
+document.addEventListener('DOMContentLoaded', () => {
+  const cards = document.querySelectorAll('.card');
+  cards.forEach((card, i) => {
+    card.style.animationDelay = (i * 0.05) + 's';
+    card.style.animation = 'fadeUp 0.5s ease both';
+    card.style.animationDelay = (i * 0.04) + 's';
+  });
+});
+</script>
+</body>
+</html>
